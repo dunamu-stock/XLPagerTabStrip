@@ -65,7 +65,7 @@ open class ButtonBarView: UICollectionView {
     var selectedBarVerticalAlignment: SelectedBarVerticalAlignment = .bottom
     var selectedBarAlignment: SelectedBarAlignment = .center
     var selectedBarFitStyle: SelectedBarFitStyle = .default
-    var selectedBarInsets: UIEdgeInsets = .zero // Only Work for 'SelectedBarFitStyle.fitToLabel'
+    var selectedBarLeftRightMargin: CGFloat = 0 // Only Work for 'SelectedBarFitStyle.fitToLabel'
     var selectedIndex = 0
 
     required public init?(coder aDecoder: NSCoder) {
@@ -220,7 +220,7 @@ open class ButtonBarView: UICollectionView {
         if self.selectedBarInsets == .zero {
             return cell.label.frame.size
         } else {
-            return CGSize(width: cell.label.frame.size.width + self.selectedBarInsets.left + self.selectedBarInsets.right,
+            return CGSize(width: cell.label.frame.size.width + self.selectedBarLeftRightMargin * 2,
                           height: cell.label.frame.size.height)
         }
     }
