@@ -65,7 +65,7 @@ open class ButtonBarView: UICollectionView {
     var selectedBarVerticalAlignment: SelectedBarVerticalAlignment = .bottom
     var selectedBarAlignment: SelectedBarAlignment = .center
     var selectedBarFitStyle: SelectedBarFitStyle = .default
-    var selectedBarInsets: UIEdgeInsets = .zero // Only Work for 'SelectedBarFitStyle.fitToLabel
+    var selectedBarInsets: UIEdgeInsets = .zero // Only Work for 'SelectedBarFitStyle.fitToLabel'
     var selectedIndex = 0
 
     required public init?(coder aDecoder: NSCoder) {
