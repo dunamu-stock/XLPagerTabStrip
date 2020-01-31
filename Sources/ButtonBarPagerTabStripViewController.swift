@@ -334,6 +334,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             cell.imageView.image = image
             cell.imageView.widthAnchor.constraint(equalToConstant: image.size.width).isActive = true
             cell.imageView.heightAnchor.constraint(equalToConstant: image.size.height).isActive = true
+        } else {
+            cell.imageView.image = nil
         }
         if let highlightedImage = indicatorInfo.highlightedImage {
             cell.imageView.highlightedImage = highlightedImage
