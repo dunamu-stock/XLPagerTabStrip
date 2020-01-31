@@ -104,12 +104,18 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         }
         
         buttonBarItemSpec = .nibFile(nibName: "ButtonCell", bundle: bundle, width: { [weak self] (childItemInfo) -> CGFloat in
+            if let text = childItemInfo.title {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = self?.settings.style.buttonBarItemFont
-                label.text = childItemInfo.title
+                label.text = text
                 let labelSize = label.intrinsicContentSize
                 return labelSize.width + (self?.settings.style.buttonBarItemLeftRightMargin ?? 8) * 2
+            } else if let image = childItemInfo.image {
+                return image.size.width + (self?.settings.style.buttonBarItemLeftRightMargin ?? 8) * 2
+            } else {
+                return CGFloat.leastNormalMagnitude
+            }
         })
 
         let buttonBarViewAux = buttonBarView ?? {
@@ -326,6 +332,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         cell.backgroundColor = settings.style.buttonBarItemBackgroundColor ?? cell.backgroundColor
         if let image = indicatorInfo.image {
             cell.imageView.image = image
+            cell.imageView.widthAnchor.constraint(equalToConstant: image.size.width).isActive = true
+            cell.imageView.heightAnchor.constraint(equalToConstant: image.size.height).isActive = true
         }
         if let highlightedImage = indicatorInfo.highlightedImage {
             cell.imageView.highlightedImage = highlightedImage
