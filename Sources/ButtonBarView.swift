@@ -217,7 +217,7 @@ open class ButtonBarView: UICollectionView {
         
         cell.layoutIfNeeded()
         
-        if self.selectedBarInsets == .zero {
+        if self.selectedBarLeftRightMargin == 0 {
             return cell.label.frame.size
         } else {
             return CGSize(width: cell.label.frame.size.width + self.selectedBarLeftRightMargin * 2,
