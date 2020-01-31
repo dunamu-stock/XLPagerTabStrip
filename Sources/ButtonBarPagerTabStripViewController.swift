@@ -52,6 +52,7 @@ public struct ButtonBarPagerTabStripSettings {
         public var selectedBarHeight: CGFloat = 5
         public var selectedBarVerticalAlignment: SelectedBarVerticalAlignment = .bottom
         public var selectedBarLeftRightMargin: CGFloat = 0
+        public var selectedBarFitStyle: SelectedBarFitStyle = .default
 
         public var buttonBarItemBackgroundColor: UIColor?
         public var buttonBarItemFont = UIFont.systemFont(ofSize: 18)
@@ -151,6 +152,7 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         buttonBarView.selectedBarHeight = settings.style.selectedBarHeight
         buttonBarView.selectedBarVerticalAlignment = settings.style.selectedBarVerticalAlignment
         buttonBarView.selectedBarLeftRightMargin = settings.style.selectedBarLeftRightMargin
+        buttonBarView.selectedBarFitStyle = settings.style.selectedBarFitStyle
 
         // register button bar item cell
         switch buttonBarItemSpec! {
