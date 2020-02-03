@@ -186,7 +186,7 @@ open class ButtonBarView: UICollectionView {
         if animated {
             UIView.animate(withDuration: 0.3, animations: { [weak self] in
                 self?.selectedBar.frame = selectedBarFrame
-                
+            }, completion: { (success) in
                 completion?()
             })
         } else {
