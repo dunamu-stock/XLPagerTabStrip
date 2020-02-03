@@ -37,6 +37,13 @@ open class ButtonBarViewCell: UICollectionViewCell {
         accessibilityTraits.insert([.button, .header])
     }
     
+    open override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.contentView.translatesAutoresizingMaskIntoConstraints = true
+        self.contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    }
+    
     open override var isSelected: Bool {
         get {
             return super.isSelected
