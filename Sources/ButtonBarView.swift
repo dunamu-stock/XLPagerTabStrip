@@ -82,6 +82,11 @@ open class ButtonBarView: UICollectionView {
         selectedIndex = index
         updateSelectedBarPosition(animated, swipeDirection: swipeDirection, pagerScroll: pagerScroll)
     }
+    
+    open func moveTo(index: Int, animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll, completion: (() -> ())?) {
+        selectedIndex = index
+        updateSelectedBarPosition(animated, swipeDirection: swipeDirection, pagerScroll: pagerScroll, completion: completion)
+    }
 
     open func move(fromIndex: Int, toIndex: Int, progressPercentage: CGFloat, pagerScroll: PagerScroll) {
         selectedIndex = progressPercentage > 0.5 ? toIndex : fromIndex
@@ -157,6 +162,37 @@ open class ButtonBarView: UICollectionView {
             })
         } else {
             selectedBar.frame = selectedBarFrame
+        }
+    }
+    
+    open func updateSelectedBarPosition(_ animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll, completion: (() -> ())?) {
+        var selectedBarFrame = selectedBar.frame
+
+        let selectedCellIndexPath = IndexPath(item: selectedIndex, section: 0)
+        let attributes = layoutAttributesForItem(at: selectedCellIndexPath)
+        let selectedCellFrame = attributes!.frame
+
+        updateContentOffset(animated: animated, pagerScroll: pagerScroll, toFrame: selectedCellFrame, toIndex: (selectedCellIndexPath as NSIndexPath).row)
+
+        switch self.selectedBarFitStyle {
+        case .default:
+            selectedBarFrame.size.width = selectedCellFrame.size.width
+            selectedBarFrame.origin.x = selectedCellFrame.origin.x
+        case .fitToLabel:
+            selectedBarFrame.size.width = self.labelFitSize(at: selectedIndex).width
+            selectedBarFrame.origin.x = selectedCellFrame.origin.x + (selectedCellFrame.size.width - selectedBarFrame.size.width) / 2
+        }
+
+        if animated {
+            UIView.animate(withDuration: 0.3, animations: { [weak self] in
+                self?.selectedBar.frame = selectedBarFrame
+                
+                completion?()
+            })
+        } else {
+            selectedBar.frame = selectedBarFrame
+            
+            completion?()
         }
     }
 
