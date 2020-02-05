@@ -44,6 +44,14 @@ open class ButtonBarViewCell: UICollectionViewCell {
         self.contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
     }
     
+    open override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        self.label.text = nil
+        self.label.attributedText = nil
+        self.imageView.image = nil
+    }
+    
     open override var isSelected: Bool {
         get {
             return super.isSelected
