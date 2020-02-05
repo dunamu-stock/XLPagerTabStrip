@@ -83,7 +83,7 @@ open class ButtonBarView: UICollectionView {
         updateSelectedBarPosition(animated, swipeDirection: swipeDirection, pagerScroll: pagerScroll)
     }
     
-    open func moveTo(index: Int, animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll, completion: (() -> ())?) {
+    open func moveTo(index: Int, animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll, completion: (() -> Void)?) {
         selectedIndex = index
         updateSelectedBarPosition(animated, swipeDirection: swipeDirection, pagerScroll: pagerScroll, completion: completion)
     }
@@ -165,7 +165,7 @@ open class ButtonBarView: UICollectionView {
         }
     }
     
-    open func updateSelectedBarPosition(_ animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll, completion: (() -> ())?) {
+    open func updateSelectedBarPosition(_ animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll, completion: (() -> Void)?) {
         var selectedBarFrame = selectedBar.frame
 
         let selectedCellIndexPath = IndexPath(item: selectedIndex, section: 0)
@@ -186,7 +186,7 @@ open class ButtonBarView: UICollectionView {
         if animated {
             UIView.animate(withDuration: 0.3, animations: { [weak self] in
                 self?.selectedBar.frame = selectedBarFrame
-            }, completion: { (success) in
+            }, completion: { (_) in
                 completion?()
             })
         } else {

@@ -221,7 +221,7 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         }
     }
     
-    open func reloadPagerTabStripView(completion: (() -> (Void))?) {
+    open func reloadPagerTabStripView(completion: (() -> Void)?) {
         shouldUpdateContent = false
         super.reloadPagerTabStripView()
         shouldUpdateContent = true
