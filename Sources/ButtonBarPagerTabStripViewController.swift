@@ -118,9 +118,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = self?.settings.style.buttonBarItemFont
                 label.attributedText = attributedString
-                let kern = label.attributedText?.attributes(at: 0, effectiveRange: nil).filter({ $0.key == .kern }).first?.value as! CGFloat
                 let labelSize = label.intrinsicContentSize
-                return labelSize.width - kern + (self?.settings.style.buttonBarItemLeftRightMargin ?? 8) * 2
+                return labelSize.width + (self?.settings.style.buttonBarItemLeftRightMargin ?? 8) * 2
             } else if let image = childItemInfo.image {
                 return image.size.width + (self?.settings.style.buttonBarItemLeftRightMargin ?? 8) * 2
             } else {
@@ -364,18 +363,17 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             cell.label.text = indicatorInfo.title
             cell.label.font = settings.style.buttonBarItemFont
             cell.label.textColor = settings.style.buttonBarItemTitleColor ?? cell.label.textColor
-        }
-        
-        if let attributedString = indicatorInfo.attributedString {
+        } else if let attributedString = indicatorInfo.attributedString {
             cell.label.attributedText = attributedString
         }
         
-        cell.contentView.backgroundColor = settings.style.buttonBarItemBackgroundColor ?? cell.contentView.backgroundColor
-        cell.backgroundColor = settings.style.buttonBarItemBackgroundColor ?? cell.backgroundColor
         if let image = indicatorInfo.image {
             cell.imageView.image = image
             cell.imageView.widthAnchor.constraint(equalToConstant: image.size.width).isActive = true
             cell.imageView.heightAnchor.constraint(equalToConstant: image.size.height).isActive = true
+            
+            cell.label.text = nil
+            cell.label.attributedText = nil
         } else {
             cell.imageView.image = nil
             cell.imageView.widthAnchor.constraint(equalToConstant: 0).isActive = true
@@ -384,6 +382,9 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         if let highlightedImage = indicatorInfo.highlightedImage {
             cell.imageView.highlightedImage = highlightedImage
         }
+        
+        cell.contentView.backgroundColor = settings.style.buttonBarItemBackgroundColor ?? cell.contentView.backgroundColor
+        cell.backgroundColor = settings.style.buttonBarItemBackgroundColor ?? cell.backgroundColor
 
         configureCell(cell, indicatorInfo: indicatorInfo)
 
