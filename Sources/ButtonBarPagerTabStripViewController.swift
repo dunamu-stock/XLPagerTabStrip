@@ -371,9 +371,6 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             cell.imageView.image = image
             cell.imageView.widthAnchor.constraint(equalToConstant: image.size.width).isActive = true
             cell.imageView.heightAnchor.constraint(equalToConstant: image.size.height).isActive = true
-            
-            cell.label.text = nil
-            cell.label.attributedText = nil
         } else {
             cell.imageView.image = nil
             cell.imageView.widthAnchor.constraint(equalToConstant: 0).isActive = true
