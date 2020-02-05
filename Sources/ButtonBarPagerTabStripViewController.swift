@@ -210,6 +210,7 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         
         guard isViewLoaded else { return }
         buttonBarView.reloadData()
+        buttonBarView.layoutIfNeeded()
         cachedCellWidths = calculateWidths()
         updateContent()
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes)
@@ -221,11 +222,16 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         }
     }
     
-    open func reloadPagerTabStripView(completion: (() -> ())?) {
+    open func reloadPagerTabStripView(completion: (() -> (Void))?) {
+        shouldUpdateContent = false
         super.reloadPagerTabStripView()
+        shouldUpdateContent = true
+        
         guard isViewLoaded else { return }
         buttonBarView.reloadData()
+        buttonBarView.layoutIfNeeded()
         cachedCellWidths = calculateWidths()
+        updateContent()
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes, completion: completion)
     }
 
