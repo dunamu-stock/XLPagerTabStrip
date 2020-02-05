@@ -92,9 +92,9 @@ open class BaseButtonBarPagerTabStripViewController<ButtonBarCellType: UICollect
         // register button bar item cell
         switch buttonBarItemSpec! {
         case .nibFile(let nibName, let bundle, _):
-            buttonBarView.register(UINib(nibName: nibName, bundle: bundle), forCellWithReuseIdentifier:"Cell")
+            buttonBarView.register(UINib(nibName: nibName, bundle: bundle), forCellWithReuseIdentifier: "Cell")
         case .cellClass:
-            buttonBarView.register(ButtonBarCellType.self, forCellWithReuseIdentifier:"Cell")
+            buttonBarView.register(ButtonBarCellType.self, forCellWithReuseIdentifier: "Cell")
         }
         //-
     }
