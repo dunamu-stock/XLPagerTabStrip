@@ -210,7 +210,6 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         
         guard isViewLoaded else { return }
         buttonBarView.reloadData()
-        buttonBarView.layoutIfNeeded()
         cachedCellWidths = calculateWidths()
         updateContent()
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes)
@@ -229,7 +228,6 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         
         guard isViewLoaded else { return }
         buttonBarView.reloadData()
-        buttonBarView.layoutIfNeeded()
         cachedCellWidths = calculateWidths()
         updateContent()
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes, completion: completion)
