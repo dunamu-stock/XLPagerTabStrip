@@ -212,12 +212,13 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
     open override func reloadPagerTabStripView() {
         shouldUpdateContent = false
+        buttonBarView.reloadData()
+        cachedCellWidths = calculateWidths()
+        
         super.reloadPagerTabStripView()
         shouldUpdateContent = true
         
         guard isViewLoaded else { return }
-        buttonBarView.reloadData()
-        cachedCellWidths = calculateWidths()
         updateContent()
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes)
     }
@@ -230,12 +231,13 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     
     open func reloadPagerTabStripView(completion: (() -> Void)?) {
         shouldUpdateContent = false
+        buttonBarView.reloadData()
+        cachedCellWidths = calculateWidths()
+        
         super.reloadPagerTabStripView()
         shouldUpdateContent = true
         
         guard isViewLoaded else { return }
-        buttonBarView.reloadData()
-        cachedCellWidths = calculateWidths()
         updateContent()
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes, completion: completion)
     }
@@ -265,7 +267,6 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     open func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int) {
         guard shouldUpdateButtonBarView else { return }
         
-        buttonBarView.layoutIfNeeded()
         buttonBarView.moveTo(index: toIndex, animated: false, swipeDirection: toIndex < fromIndex ? .right : .left, pagerScroll: .yes)
 
         if let changeCurrentIndex = changeCurrentIndex {
@@ -280,7 +281,6 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     open func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int, withProgressPercentage progressPercentage: CGFloat, indexWasChanged: Bool) {
         guard shouldUpdateButtonBarView else { return }
         
-        buttonBarView.layoutIfNeeded()
         buttonBarView.move(fromIndex: fromIndex, toIndex: toIndex, progressPercentage: progressPercentage, pagerScroll: .yes)
         if let changeCurrentIndexProgressive = changeCurrentIndexProgressive {
             let oldIndexPath = IndexPath(item: currentIndex != fromIndex ? fromIndex : toIndex, section: 0)
