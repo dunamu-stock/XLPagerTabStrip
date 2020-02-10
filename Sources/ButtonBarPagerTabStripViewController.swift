@@ -200,6 +200,7 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         //    *new* frame so that the buttonBarView cell's actually get resized correctly
         cachedCellWidths = calculateWidths()
         buttonBarView.collectionViewLayout.invalidateLayout()
+        buttonBarView.layoutIfNeeded()
         // When the view first appears or is rotated we also need to ensure that the barButtonView's
         // selectedBar is resized and its contentOffset/scroll is set correctly (the selected
         // tab/cell may end up either skewed or off screen after a rotation otherwise)
