@@ -374,17 +374,16 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             cell.label.attributedText = nil
         }
         
+        cell.imageView.contentMode = .center
+        cell.imageView.image = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
+        cell.imageView.highlightedImage = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
+        
         if let image = indicatorInfo.image {
-            cell.imageView.image = image
             cell.imageViewWidthConstraint.constant = image.size.width
             cell.imageViewHeightConstraint.constant = image.size.height
         } else {
-            cell.imageView.image = nil
             cell.imageViewWidthConstraint.constant = 0
             cell.imageViewHeightConstraint.constant = 0
-        }
-        if let highlightedImage = indicatorInfo.highlightedImage {
-            cell.imageView.highlightedImage = highlightedImage
         }
         
         cell.contentView.backgroundColor = settings.style.buttonBarItemBackgroundColor ?? cell.contentView.backgroundColor
