@@ -363,8 +363,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         let childController = viewControllers[indexPath.item] as! IndicatorInfoProvider // swiftlint:disable:this force_cast
         let indicatorInfo = childController.indicatorInfo(for: self)
 
-        if let _ = indicatorInfo.title {
-            cell.label.text = indicatorInfo.title
+        if let title = indicatorInfo.title {
+            cell.label.text = title
             cell.label.font = settings.style.buttonBarItemFont
             cell.label.textColor = settings.style.buttonBarItemTitleColor ?? cell.label.textColor
         } else if let attributedString = indicatorInfo.attributedString {
@@ -376,12 +376,12 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         
         if let image = indicatorInfo.image {
             cell.imageView.image = image
-            cell.imageView.widthAnchor.constraint(equalToConstant: image.size.width).isActive = true
-            cell.imageView.heightAnchor.constraint(equalToConstant: image.size.height).isActive = true
+            cell.imageViewWidthConstraint.constant = image.size.width
+            cell.imageViewHeightConstraint.constant = image.size.height
         } else {
             cell.imageView.image = nil
-            cell.imageView.widthAnchor.constraint(equalToConstant: 0).isActive = true
-            cell.imageView.heightAnchor.constraint(equalToConstant: 0).isActive = true
+            cell.imageViewWidthConstraint.constant = 0
+            cell.imageViewHeightConstraint.constant = 0
         }
         if let highlightedImage = indicatorInfo.highlightedImage {
             cell.imageView.highlightedImage = highlightedImage
