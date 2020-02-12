@@ -51,6 +51,8 @@ public struct ButtonBarPagerTabStripSettings {
         public var selectedBarBackgroundColor = UIColor.black
         public var selectedBarHeight: CGFloat = 5
         public var selectedBarVerticalAlignment: SelectedBarVerticalAlignment = .bottom
+        public var selectedBarLeftRightMargin: CGFloat = 0
+        public var selectedBarFitStyle: SelectedBarFitStyle = .default
 
         public var buttonBarItemBackgroundColor: UIColor?
         public var buttonBarItemFont = UIFont.systemFont(ofSize: 18)
@@ -75,6 +77,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
     @IBOutlet public weak var buttonBarView: ButtonBarView!
 
+    private var shouldUpdateContent = true
+    
     lazy private var cachedCellWidths: [CGFloat]? = { [unowned self] in
         return self.calculateWidths()
     }()
@@ -102,12 +106,25 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         }
         
         buttonBarItemSpec = .nibFile(nibName: "ButtonCell", bundle: bundle, width: { [weak self] (childItemInfo) -> CGFloat in
+            if let text = childItemInfo.title {
                 let label = UILabel()
                 label.translatesAutoresizingMaskIntoConstraints = false
                 label.font = self?.settings.style.buttonBarItemFont
-                label.text = childItemInfo.title
+                label.text = text
                 let labelSize = label.intrinsicContentSize
                 return labelSize.width + (self?.settings.style.buttonBarItemLeftRightMargin ?? 8) * 2
+            } else if let attributedString = childItemInfo.attributedString {
+                let label = UILabel()
+                label.translatesAutoresizingMaskIntoConstraints = false
+                label.font = self?.settings.style.buttonBarItemFont
+                label.attributedText = attributedString
+                let labelSize = label.intrinsicContentSize
+                return labelSize.width + (self?.settings.style.buttonBarItemLeftRightMargin ?? 8) * 2
+            } else if let image = childItemInfo.image {
+                return image.size.width + (self?.settings.style.buttonBarItemLeftRightMargin ?? 8) * 2
+            } else {
+                return CGFloat.leastNormalMagnitude
+            }
         })
 
         let buttonBarViewAux = buttonBarView ?? {
@@ -149,20 +166,21 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
         buttonBarView.selectedBarHeight = settings.style.selectedBarHeight
         buttonBarView.selectedBarVerticalAlignment = settings.style.selectedBarVerticalAlignment
+        buttonBarView.selectedBarLeftRightMargin = settings.style.selectedBarLeftRightMargin
+        buttonBarView.selectedBarFitStyle = settings.style.selectedBarFitStyle
 
         // register button bar item cell
         switch buttonBarItemSpec! {
         case .nibFile(let nibName, let bundle, _):
-            buttonBarView.register(UINib(nibName: nibName, bundle: bundle), forCellWithReuseIdentifier:"Cell")
+            buttonBarView.register(UINib(nibName: nibName, bundle: bundle), forCellWithReuseIdentifier: "Cell")
         case .cellClass:
-            buttonBarView.register(ButtonBarViewCell.self, forCellWithReuseIdentifier:"Cell")
+            buttonBarView.register(ButtonBarViewCell.self, forCellWithReuseIdentifier: "Cell")
         }
         //-
     }
 
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        buttonBarView.layoutIfNeeded()
     }
 
     open override func viewDidLayoutSubviews() {
@@ -182,6 +200,7 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         //    *new* frame so that the buttonBarView cell's actually get resized correctly
         cachedCellWidths = calculateWidths()
         buttonBarView.collectionViewLayout.invalidateLayout()
+        buttonBarView.layoutIfNeeded()
         // When the view first appears or is rotated we also need to ensure that the barButtonView's
         // selectedBar is resized and its contentOffset/scroll is set correctly (the selected
         // tab/cell may end up either skewed or off screen after a rotation otherwise)
@@ -192,11 +211,33 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     // MARK: - Public Methods
 
     open override func reloadPagerTabStripView() {
+        shouldUpdateContent = false
         super.reloadPagerTabStripView()
+        shouldUpdateContent = true
+        
         guard isViewLoaded else { return }
-        buttonBarView.reloadData()
         cachedCellWidths = calculateWidths()
+        buttonBarView.reloadData()
+        updateContent()
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes)
+    }
+    
+    open override func updateContent() {
+        if shouldUpdateContent {
+            super.updateContent()
+        }
+    }
+    
+    open func reloadPagerTabStripView(completion: (() -> Void)?) {
+        shouldUpdateContent = false
+        super.reloadPagerTabStripView()
+        shouldUpdateContent = true
+        
+        guard isViewLoaded else { return }
+        cachedCellWidths = calculateWidths()
+        buttonBarView.reloadData()
+        updateContent()
+        buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes, completion: completion)
     }
 
     open func calculateStretchedCellWidths(_ minimumCellWidths: [CGFloat], suggestedStretchedCellWidth: CGFloat, previousNumberOfLargeCells: Int) -> CGFloat {
@@ -223,6 +264,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
     open func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int) {
         guard shouldUpdateButtonBarView else { return }
+        
+        buttonBarView.layoutIfNeeded()
         buttonBarView.moveTo(index: toIndex, animated: false, swipeDirection: toIndex < fromIndex ? .right : .left, pagerScroll: .yes)
 
         if let changeCurrentIndex = changeCurrentIndex {
@@ -236,6 +279,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
     open func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int, withProgressPercentage progressPercentage: CGFloat, indexWasChanged: Bool) {
         guard shouldUpdateButtonBarView else { return }
+        
+        buttonBarView.layoutIfNeeded()
         buttonBarView.move(fromIndex: fromIndex, toIndex: toIndex, progressPercentage: progressPercentage, pagerScroll: .yes)
         if let changeCurrentIndexProgressive = changeCurrentIndexProgressive {
             let oldIndexPath = IndexPath(item: currentIndex != fromIndex ? fromIndex : toIndex, section: 0)
@@ -248,7 +293,10 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
     private func cellForItems(at indexPaths: [IndexPath], reloadIfNotVisible reload: Bool = true) -> [ButtonBarViewCell?] {
         let cells = indexPaths.map { buttonBarView.cellForItem(at: $0) as? ButtonBarViewCell }
-
+        
+        let uniqueIndexPaths = Set<IndexPath>(indexPaths)
+        guard uniqueIndexPaths.count > 1 else { return cells }
+        
         if reload {
             let indexPathsToReload = cells.enumerated()
                 .compactMap { (arg) -> IndexPath? in
@@ -315,17 +363,31 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         let childController = viewControllers[indexPath.item] as! IndicatorInfoProvider // swiftlint:disable:this force_cast
         let indicatorInfo = childController.indicatorInfo(for: self)
 
-        cell.label.text = indicatorInfo.title
-        cell.label.font = settings.style.buttonBarItemFont
-        cell.label.textColor = settings.style.buttonBarItemTitleColor ?? cell.label.textColor
+        if let title = indicatorInfo.title {
+            cell.label.text = title
+            cell.label.font = settings.style.buttonBarItemFont
+            cell.label.textColor = settings.style.buttonBarItemTitleColor ?? cell.label.textColor
+        } else if let attributedString = indicatorInfo.attributedString {
+            cell.label.attributedText = attributedString
+        } else {
+            cell.label.text = nil
+            cell.label.attributedText = nil
+        }
+        
+        cell.imageView.contentMode = .center
+        cell.imageView.image = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
+        cell.imageView.highlightedImage = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
+        
+        if let image = indicatorInfo.image {
+            cell.imageViewWidthConstraint.constant = image.size.width
+            cell.imageViewHeightConstraint.constant = image.size.height
+        } else {
+            cell.imageViewWidthConstraint.constant = 0
+            cell.imageViewHeightConstraint.constant = 0
+        }
+        
         cell.contentView.backgroundColor = settings.style.buttonBarItemBackgroundColor ?? cell.contentView.backgroundColor
         cell.backgroundColor = settings.style.buttonBarItemBackgroundColor ?? cell.backgroundColor
-        if let image = indicatorInfo.image {
-            cell.imageView.image = image
-        }
-        if let highlightedImage = indicatorInfo.highlightedImage {
-            cell.imageView.highlightedImage = highlightedImage
-        }
 
         configureCell(cell, indicatorInfo: indicatorInfo)
 

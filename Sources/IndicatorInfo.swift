@@ -27,6 +27,7 @@ import Foundation
 public struct IndicatorInfo {
 
     public var title: String?
+    public var attributedString: NSAttributedString?
     public var image: UIImage?
     public var highlightedImage: UIImage?
     public var accessibilityLabel: String?
@@ -51,17 +52,37 @@ public struct IndicatorInfo {
         self.userInfo = userInfo
     }
     
-    public init(title: String?, accessibilityLabel:String?, image: UIImage?, highlightedImage: UIImage? = nil, userInfo: Any? = nil) {
+    public init(title: String?, accessibilityLabel: String?, image: UIImage?, highlightedImage: UIImage? = nil, userInfo: Any? = nil) {
         self.title = title
         self.accessibilityLabel = accessibilityLabel
         self.image = image
         self.highlightedImage = highlightedImage
         self.userInfo = userInfo
     }
-
+    
+    public init(attributedString: NSAttributedString?) {
+        self.attributedString = attributedString
+        self.accessibilityLabel = attributedString?.string
+    }
+    
+    public init(attributedString: NSAttributedString?, image: UIImage?, highlightedImage: UIImage? = nil, userInfo: Any? = nil) {
+        self.attributedString = attributedString
+        self.accessibilityLabel = attributedString?.string
+        self.image = image
+        self.highlightedImage = highlightedImage
+        self.userInfo = userInfo
+    }
+    
+    public init(attributedString: NSAttributedString?, accessibilityLabel: String?, image: UIImage?, highlightedImage: UIImage? = nil, userInfo: Any? = nil) {
+        self.attributedString = attributedString
+        self.accessibilityLabel = attributedString?.string
+        self.image = image
+        self.highlightedImage = highlightedImage
+        self.userInfo = userInfo
+    }
 }
 
-extension IndicatorInfo : ExpressibleByStringLiteral {
+extension IndicatorInfo: ExpressibleByStringLiteral {
 
     public init(stringLiteral value: String) {
         title = value

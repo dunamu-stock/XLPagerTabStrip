@@ -43,6 +43,11 @@ public enum SelectedBarVerticalAlignment {
     case bottom
 }
 
+public enum SelectedBarFitStyle {
+    case `default`
+    case fitToLabel
+}
+
 open class ButtonBarView: UICollectionView {
 
     open lazy var selectedBar: UIView = { [unowned self] in
@@ -56,8 +61,11 @@ open class ButtonBarView: UICollectionView {
             updateSelectedBarYPosition()
         }
     }
+    
     var selectedBarVerticalAlignment: SelectedBarVerticalAlignment = .bottom
     var selectedBarAlignment: SelectedBarAlignment = .center
+    var selectedBarFitStyle: SelectedBarFitStyle = .default
+    var selectedBarLeftRightMargin: CGFloat = 0 // Only Work for 'SelectedBarFitStyle.fitToLabel'
     var selectedIndex = 0
 
     required public init?(coder aDecoder: NSCoder) {
@@ -74,11 +82,16 @@ open class ButtonBarView: UICollectionView {
         selectedIndex = index
         updateSelectedBarPosition(animated, swipeDirection: swipeDirection, pagerScroll: pagerScroll)
     }
+    
+    open func moveTo(index: Int, animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll, completion: (() -> Void)?) {
+        selectedIndex = index
+        updateSelectedBarPosition(animated, swipeDirection: swipeDirection, pagerScroll: pagerScroll, completion: completion)
+    }
 
     open func move(fromIndex: Int, toIndex: Int, progressPercentage: CGFloat, pagerScroll: PagerScroll) {
         selectedIndex = progressPercentage > 0.5 ? toIndex : fromIndex
 
-        let fromFrame = layoutAttributesForItem(at: IndexPath(item: fromIndex, section: 0))!.frame
+        var fromFrame = layoutAttributesForItem(at: IndexPath(item: fromIndex, section: 0))!.frame
         let numberOfItems = dataSource!.collectionView(self, numberOfItemsInSection: 0)
 
         var toFrame: CGRect
@@ -93,6 +106,18 @@ open class ButtonBarView: UICollectionView {
             }
         } else {
             toFrame = layoutAttributesForItem(at: IndexPath(item: toIndex, section: 0))!.frame
+        }
+        
+        if selectedBarFitStyle == .fitToLabel {
+            let fromLabelSize = self.labelFitSize(at: fromIndex)
+            let fromOrigin = CGPoint(x: fromFrame.origin.x + ((fromFrame.size.width - fromLabelSize.width) / 2), y: fromFrame.origin.y)
+            fromFrame = CGRect(origin: fromOrigin, size: fromLabelSize)
+            
+            let toLabelSize = self.labelFitSize(at: toIndex)
+            let toOrigin = CGPoint(x: toFrame.origin.x + ((toFrame.size.width - toLabelSize.width) / 2), y: toFrame.origin.y)
+            toFrame = CGRect(origin: toOrigin, size: toLabelSize)
+        } else {
+            // Do Nothing !!
         }
 
         var targetFrame = fromFrame
@@ -122,8 +147,14 @@ open class ButtonBarView: UICollectionView {
 
         updateContentOffset(animated: animated, pagerScroll: pagerScroll, toFrame: selectedCellFrame, toIndex: (selectedCellIndexPath as NSIndexPath).row)
 
-        selectedBarFrame.size.width = selectedCellFrame.size.width
-        selectedBarFrame.origin.x = selectedCellFrame.origin.x
+        switch self.selectedBarFitStyle {
+        case .default:
+            selectedBarFrame.size.width = selectedCellFrame.size.width
+            selectedBarFrame.origin.x = selectedCellFrame.origin.x
+        case .fitToLabel:
+            selectedBarFrame.size.width = self.labelFitSize(at: selectedIndex).width
+            selectedBarFrame.origin.x = selectedCellFrame.origin.x + (selectedCellFrame.size.width - selectedBarFrame.size.width) / 2
+        }
 
         if animated {
             UIView.animate(withDuration: 0.3, animations: { [weak self] in
@@ -131,6 +162,37 @@ open class ButtonBarView: UICollectionView {
             })
         } else {
             selectedBar.frame = selectedBarFrame
+        }
+    }
+    
+    open func updateSelectedBarPosition(_ animated: Bool, swipeDirection: SwipeDirection, pagerScroll: PagerScroll, completion: (() -> Void)?) {
+        var selectedBarFrame = selectedBar.frame
+
+        let selectedCellIndexPath = IndexPath(item: selectedIndex, section: 0)
+        let attributes = layoutAttributesForItem(at: selectedCellIndexPath)
+        let selectedCellFrame = attributes!.frame
+
+        updateContentOffset(animated: animated, pagerScroll: pagerScroll, toFrame: selectedCellFrame, toIndex: (selectedCellIndexPath as NSIndexPath).row)
+
+        switch self.selectedBarFitStyle {
+        case .default:
+            selectedBarFrame.size.width = selectedCellFrame.size.width
+            selectedBarFrame.origin.x = selectedCellFrame.origin.x
+        case .fitToLabel:
+            selectedBarFrame.size.width = self.labelFitSize(at: selectedIndex).width
+            selectedBarFrame.origin.x = selectedCellFrame.origin.x + (selectedCellFrame.size.width - selectedBarFrame.size.width) / 2
+        }
+
+        if animated {
+            UIView.animate(withDuration: 0.3, animations: { [weak self] in
+                self?.selectedBar.frame = selectedBarFrame
+            }, completion: { (_) in
+                completion?()
+            })
+        } else {
+            selectedBar.frame = selectedBarFrame
+            
+            completion?()
         }
     }
 
@@ -182,6 +244,21 @@ open class ButtonBarView: UICollectionView {
 
         selectedBarFrame.size.height = selectedBarHeight
         selectedBar.frame = selectedBarFrame
+    }
+    
+    private func labelFitSize(at index: Int) -> CGSize {
+        guard let cell = self.cellForItem(at: IndexPath.init(row: index, section: 0)) as? ButtonBarViewCell else {
+            return .zero
+        }
+        
+        cell.layoutIfNeeded()
+        
+        if self.selectedBarLeftRightMargin == 0 {
+            return cell.label.frame.size
+        } else {
+            return CGSize(width: cell.label.frame.size.width + self.selectedBarLeftRightMargin * 2,
+                          height: cell.label.frame.size.height)
+        }
     }
 
     override open func layoutSubviews() {

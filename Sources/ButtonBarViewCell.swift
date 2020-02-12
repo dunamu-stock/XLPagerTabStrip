@@ -30,11 +30,29 @@ open class ButtonBarViewCell: UICollectionViewCell {
     @IBOutlet open var imageView: UIImageView!
     @IBOutlet open var label: UILabel!
 
+    @IBOutlet weak open var imageViewWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak open var imageViewHeightConstraint: NSLayoutConstraint!
+    
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
         isAccessibilityElement = true
         accessibilityTraits.insert([.button, .header])
+    }
+    
+    open override func awakeFromNib() {
+        super.awakeFromNib()
+        
+        self.contentView.translatesAutoresizingMaskIntoConstraints = true
+        self.contentView.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    }
+    
+    open override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        self.label.text = nil
+        self.label.attributedText = nil
+        self.imageView.image = nil
     }
     
     open override var isSelected: Bool {
@@ -43,7 +61,7 @@ open class ButtonBarViewCell: UICollectionViewCell {
         }
         set {
             super.isSelected = newValue
-            if (newValue) {
+            if newValue {
                 accessibilityTraits.insert(.selected)
             } else {
                 accessibilityTraits.remove(.selected)
