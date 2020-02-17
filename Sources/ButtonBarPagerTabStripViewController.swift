@@ -235,17 +235,19 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         } else {
             buttonBarView.reloadData()
             cachedCellWidths = calculateWidths()
+            updateContent()
         }
         
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes)
     }
     
     open override func updateContent() {
-        if #available(iOS 11.0, *) {
-            if shouldUpdateContent {
-                super.updateContent()
-            }
-        } else if #available(iOS 10.0, *) {
+//        if #available(iOS 11.0, *) {
+//
+//        } else if #available(iOS 10.0, *) {
+//            super.updateContent()
+//        }
+        if shouldUpdateContent {
             super.updateContent()
         }
     }
@@ -263,6 +265,7 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         } else {
             buttonBarView.reloadData()
             cachedCellWidths = calculateWidths()
+            updateContent()
         }
         
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes, completion: completion)
@@ -295,7 +298,11 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         
         if #available(iOS 11.0, *) {
             buttonBarView.layoutIfNeeded()
+        } else if #available(iOS 10.0, *) {
+            buttonBarView.reloadData()
+            buttonBarView.layoutIfNeeded()
         }
+        
         buttonBarView.moveTo(index: toIndex, animated: false, swipeDirection: toIndex < fromIndex ? .right : .left, pagerScroll: .yes)
 
         if let changeCurrentIndex = changeCurrentIndex {
@@ -311,6 +318,9 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         guard shouldUpdateButtonBarView else { return }
         
         if #available(iOS 11.0, *) {
+            buttonBarView.layoutIfNeeded()
+        } else if #available(iOS 10.0, *) {
+            buttonBarView.reloadData()
             buttonBarView.layoutIfNeeded()
         }
         
