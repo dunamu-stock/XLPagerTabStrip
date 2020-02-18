@@ -181,6 +181,12 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
     open override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
+        
+        if #available(iOS 11.0, *) {
+            
+        } else if #available(iOS 10.0, *) {
+            buttonBarView.layoutIfNeeded()
+        }
     }
 
     open override func viewDidLayoutSubviews() {
@@ -198,9 +204,15 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         // b) The view is rotating.  This ensures that
         //    collectionView:layout:sizeForItemAtIndexPath: is called again and can use the views
         //    *new* frame so that the buttonBarView cell's actually get resized correctly
-        cachedCellWidths = calculateWidths()
-        buttonBarView.collectionViewLayout.invalidateLayout()
-        buttonBarView.layoutIfNeeded()
+        if #available(iOS 11.0, *) {
+            cachedCellWidths = calculateWidths()
+            buttonBarView.collectionViewLayout.invalidateLayout()
+            buttonBarView.layoutIfNeeded()
+        } else {
+            cachedCellWidths = calculateWidths()
+            buttonBarView.collectionViewLayout.invalidateLayout()
+        }
+        
         // When the view first appears or is rotated we also need to ensure that the barButtonView's
         // selectedBar is resized and its contentOffset/scroll is set correctly (the selected
         // tab/cell may end up either skewed or off screen after a rotation otherwise)
@@ -216,13 +228,25 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         shouldUpdateContent = true
         
         guard isViewLoaded else { return }
-        cachedCellWidths = calculateWidths()
-        buttonBarView.reloadData()
-        updateContent()
+        if #available(iOS 11.0, *) {
+            cachedCellWidths = calculateWidths()
+            buttonBarView.reloadData()
+            updateContent()
+        } else {
+            buttonBarView.reloadData()
+            cachedCellWidths = calculateWidths()
+            updateContent()
+        }
+        
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes)
     }
     
     open override func updateContent() {
+//        if #available(iOS 11.0, *) {
+//
+//        } else if #available(iOS 10.0, *) {
+//            super.updateContent()
+//        }
         if shouldUpdateContent {
             super.updateContent()
         }
@@ -234,9 +258,16 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         shouldUpdateContent = true
         
         guard isViewLoaded else { return }
-        cachedCellWidths = calculateWidths()
-        buttonBarView.reloadData()
-        updateContent()
+        if #available(iOS 11.0, *) {
+            cachedCellWidths = calculateWidths()
+            buttonBarView.reloadData()
+            updateContent()
+        } else {
+            buttonBarView.reloadData()
+            cachedCellWidths = calculateWidths()
+            updateContent()
+        }
+        
         buttonBarView.moveTo(index: currentIndex, animated: false, swipeDirection: .none, pagerScroll: .yes, completion: completion)
     }
 
@@ -265,7 +296,13 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     open func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int) {
         guard shouldUpdateButtonBarView else { return }
         
-        buttonBarView.layoutIfNeeded()
+        if #available(iOS 11.0, *) {
+            buttonBarView.layoutIfNeeded()
+        } else if #available(iOS 10.0, *) {
+            buttonBarView.reloadData()
+            buttonBarView.layoutIfNeeded()
+        }
+        
         buttonBarView.moveTo(index: toIndex, animated: false, swipeDirection: toIndex < fromIndex ? .right : .left, pagerScroll: .yes)
 
         if let changeCurrentIndex = changeCurrentIndex {
@@ -280,7 +317,13 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     open func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int, withProgressPercentage progressPercentage: CGFloat, indexWasChanged: Bool) {
         guard shouldUpdateButtonBarView else { return }
         
-        buttonBarView.layoutIfNeeded()
+        if #available(iOS 11.0, *) {
+            buttonBarView.layoutIfNeeded()
+        } else if #available(iOS 10.0, *) {
+            buttonBarView.reloadData()
+            buttonBarView.layoutIfNeeded()
+        }
+        
         buttonBarView.move(fromIndex: fromIndex, toIndex: toIndex, progressPercentage: progressPercentage, pagerScroll: .yes)
         if let changeCurrentIndexProgressive = changeCurrentIndexProgressive {
             let oldIndexPath = IndexPath(item: currentIndex != fromIndex ? fromIndex : toIndex, section: 0)
