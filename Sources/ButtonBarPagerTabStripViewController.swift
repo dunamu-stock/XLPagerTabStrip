@@ -417,6 +417,16 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             cell.label.attributedText = nil
         }
         
+        if settings.style.selectedBarFitStyle == .default {
+            if let width = cachedCellWidths?[indexPath.item] {
+                cell.labelWidthConstraint.constant = width
+            }
+        } else {
+            if cell.labelWidthConstraint != nil {
+                cell.labelWidthConstraint.isActive = false
+            }
+        }
+        
         cell.imageView.contentMode = .center
         cell.imageView.image = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
         cell.imageView.highlightedImage = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
