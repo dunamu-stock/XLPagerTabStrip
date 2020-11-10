@@ -410,20 +410,22 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             cell.label.text = title
             cell.label.font = settings.style.buttonBarItemFont
             cell.label.textColor = settings.style.buttonBarItemTitleColor ?? cell.label.textColor
-            if settings.style.selectedBarFitStyle == .default {
-                if let width = cachedCellWidths?[indexPath.item] {
-                    cell.labelWidthConstraint.constant = width
-                }
-            }
         } else if let attributedString = indicatorInfo.attributedString {
             cell.label.attributedText = attributedString
-            if let width = cachedCellWidths?[indexPath.item] {
-                cell.labelWidthConstraint.constant = width
-            }
             cell.label.clipsToBounds = false
         } else {
             cell.label.text = nil
             cell.label.attributedText = nil
+        }
+        
+        if settings.style.selectedBarFitStyle == .default {
+            if let width = cachedCellWidths?[indexPath.item] {
+                cell.labelWidthConstraint.constant = width
+            }
+        } else {
+            if cell.labelWidthConstraint != nil {
+                cell.labelWidthConstraint.isActive = false
+            }
         }
         
         cell.imageView.contentMode = .center
