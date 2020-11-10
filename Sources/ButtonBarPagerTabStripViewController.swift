@@ -412,7 +412,6 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             cell.label.textColor = settings.style.buttonBarItemTitleColor ?? cell.label.textColor
         } else if let attributedString = indicatorInfo.attributedString {
             cell.label.attributedText = attributedString
-            cell.label.clipsToBounds = false
         } else {
             cell.label.text = nil
             cell.label.attributedText = nil
