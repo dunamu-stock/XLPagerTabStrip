@@ -148,8 +148,17 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
         return false
     }
 
+    open func shouldMoveToViewController(at index: Int) -> Bool {
+        return true
+    }
+    
     open func moveToViewController(at index: Int, animated: Bool = true) {
         guard isViewLoaded && view.window != nil && currentIndex != index else {
+            preCurrentIndex = index
+            return
+        }
+        
+        guard shouldMoveToViewController(at: index) else {
             preCurrentIndex = index
             return
         }
@@ -382,7 +391,14 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
             fatalError("viewControllers(for:) should provide at least one child view controller")
         }
         viewControllers.forEach { if !($0 is IndicatorInfoProvider) { fatalError("Every view controller provided by PagerTabStripDataSource's viewControllers(for:) method must conform to IndicatorInfoProvider") }}
+        
+        var isScrollEnabled = true
+        
+        for (index, _) in viewControllers.enumerated() {
+            isScrollEnabled = isScrollEnabled && self.shouldMoveToViewController(at: index)
+        }
 
+        self.containerView.isScrollEnabled = isScrollEnabled
     }
 
     private var pagerTabStripChildViewControllersForScrolling: [UIViewController]?

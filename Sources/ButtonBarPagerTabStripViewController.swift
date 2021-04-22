@@ -188,6 +188,10 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
             buttonBarView.layoutIfNeeded()
         }
     }
+    
+    open override func shouldMoveToViewController(at index: Int) -> Bool {
+        return true
+    }
 
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -392,6 +396,10 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
 
     // MARK: - UICollectionViewDataSource
 
+    open func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        return shouldMoveToViewController(at: indexPath.item)
+    }
+    
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewControllers.count
     }
