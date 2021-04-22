@@ -224,6 +224,10 @@ open class BaseButtonBarPagerTabStripViewController<ButtonBarCellType: UICollect
 
     // MARK: - UICollectionViewDataSource
 
+    open func collectionView(_ collectionView: UICollectionView, shouldSelectItemAt indexPath: IndexPath) -> Bool {
+        return true
+    }
+    
     open func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return viewControllers.count
     }
