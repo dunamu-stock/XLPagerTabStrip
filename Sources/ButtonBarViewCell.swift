@@ -30,12 +30,10 @@ open class ButtonBarViewCell: UICollectionViewCell {
     @IBOutlet open var imageView: UIImageView!
     @IBOutlet open var label: UILabel!
 
-    @IBOutlet weak open var labelWidthConstraint: NSLayoutConstraint!
+    @IBOutlet weak var labelWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak open var imageViewWidthConstraint: NSLayoutConstraint!
     @IBOutlet weak open var imageViewHeightConstraint: NSLayoutConstraint!
     
-    @IBOutlet weak open var imageViewCenterXConstraint: NSLayoutConstraint!
-    @IBOutlet weak open var labelViewCenterXConstraint: NSLayoutConstraint!
     public required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
         
