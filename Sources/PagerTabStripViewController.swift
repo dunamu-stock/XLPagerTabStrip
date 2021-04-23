@@ -147,6 +147,10 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
     open override var shouldAutomaticallyForwardAppearanceMethods: Bool {
         return false
     }
+    
+    open func canMoveToViewController(at index: Int) -> Bool {
+        return true
+    }
 
     open func shouldMoveToViewController(at index: Int) -> Bool {
         return true
@@ -395,7 +399,7 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
         var isScrollEnabled = true
         
         for (index, _) in viewControllers.enumerated() {
-            isScrollEnabled = isScrollEnabled && self.shouldMoveToViewController(at: index)
+            isScrollEnabled = isScrollEnabled && self.canMoveToViewController(at: index)
         }
 
         self.containerView.isScrollEnabled = isScrollEnabled

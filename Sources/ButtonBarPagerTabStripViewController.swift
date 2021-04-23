@@ -192,6 +192,10 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     open override func shouldMoveToViewController(at index: Int) -> Bool {
         return true
     }
+    
+    open override func canMoveToViewController(at index: Int) -> Bool {
+        return true
+    }
 
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -436,8 +440,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         }
         
         cell.imageView.contentMode = .center
-        cell.imageView.image = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
-        cell.imageView.highlightedImage = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
+        cell.imageView.image = indicatorInfo.image//?.withRenderingMode(.alwaysOriginal)
+        cell.imageView.highlightedImage = indicatorInfo.image//?.withRenderingMode(.alwaysOriginal)
         
         if let image = indicatorInfo.image {
             cell.imageViewWidthConstraint.constant = image.size.width
