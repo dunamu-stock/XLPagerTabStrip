@@ -6,6 +6,20 @@
 	objectVersion = 48;
 	objects = {
 
+/* Begin PBXAggregateTarget section */
+		BA91C144266F0D6B00E6486F /* XLPagerTabStrip-Universal */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = BA91C147266F0D6B00E6486F /* Build configuration list for PBXAggregateTarget "XLPagerTabStrip-Universal" */;
+			buildPhases = (
+				BA91C148266F0D6E00E6486F /* Universal Buiild Script */,
+			);
+			dependencies = (
+			);
+			name = "XLPagerTabStrip-Universal";
+			productName = "XLPagerTabStrip-Universal";
+		};
+/* End PBXAggregateTarget section */
+
 /* Begin PBXBuildFile section */
 		281BFDC11C511C420090C26F /* IndicatorInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281BFDC01C511C420090C26F /* IndicatorInfo.swift */; };
 		281BFDC31C511F120090C26F /* PagerTabStripBehaviour.swift in Sources */ = {isa = PBXBuildFile; fileRef = 281BFDC21C511F120090C26F /* PagerTabStripBehaviour.swift */; };
@@ -238,6 +252,10 @@
 						CreatedOnToolsVersion = 7.2;
 						LastSwiftMigration = 1020;
 					};
+					BA91C144266F0D6B00E6486F = {
+						CreatedOnToolsVersion = 12.5;
+						ProvisioningStyle = Automatic;
+					};
 				};
 			};
 			buildConfigurationList = 28F828771C494B2C00330CF4 /* Build configuration list for PBXProject "XLPagerTabStrip" */;
@@ -255,6 +273,7 @@
 			targets = (
 				28F8287C1C494B2C00330CF4 /* XLPagerTabStrip */,
 				28F828861C494B2C00330CF4 /* XLPagerTabStripTests */,
+				BA91C144266F0D6B00E6486F /* XLPagerTabStrip-Universal */,
 			);
 		};
 /* End PBXProject section */
@@ -278,6 +297,24 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
+		BA91C148266F0D6E00E6486F /* Universal Buiild Script */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+			);
+			name = "Universal Buiild Script";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "# 1\n# Set bash script to exit immediately if any commands fail.\nset -e\n\n# 2\n# Define variables.\nFRAMEWORK_NAME=\"XLPagerTabStrip\"\nCONFIGURATION=\"Release\"\nBUILD_PATH=\"${SRCROOT}/build\"\nUNIVERAL_BUILD_PATH=\"${BUILD_PATH}/${CONFIGURATION}-universal\"\n\n# 3\n# If remnants from a previous build exist, delete them.\nif [ -d \"${BUILD_PATH}\" ]; then\nrm -rf \"${BUILD_PATH}\"\nfi\n\n# 3\n# Build the framework for device and for simulator (using all needed architectures).\nxcodebuild -target \"${FRAMEWORK_NAME}\" -project XLPagerTabStrip.xcodeproj -configuration ${CONFIGURATION} ONLY_ACTIVE_ARCH=NO DEFINES_MODULE=YES -sdk \"iphoneos\" -arch arm64 -arch arm64e -arch armv7 -arch armv7s\n\n# 4\n# Build the framework for simulator.\nxcodebuild -target \"${FRAMEWORK_NAME}\" -project XLPagerTabStrip.xcodeproj -configuration ${CONFIGURATION} ONLY_ACTIVE_ARCH=NO DEFINES_MODULE=YES -sdk \"iphonesimulator\" -arch x86_64 -arch i386\n\n# 5\n# Create directory to universal build.\nmkdir \"${UNIVERAL_BUILD_PATH}\"\n\n# 6\n# Copy the built device version of framework to univerasal build directory.\ncp -r \"${BUILD_PATH}/${CONFIGURATION}-iphoneos/${FRAMEWORK_NAME}.framework\" \"${UNIVERAL_BUILD_PATH}/\"\n\n# 7\n# Copy the swift module mappings for the simulator into the universal framework.\n# The device mappings already exist.\ncp -r \"${BUILD_PATH}/${CONFIGURATION}-iphonesimulator/${FRAMEWORK_NAME}.framework/Modules/${FRAMEWORK_NAME}.swiftmodule/\" \"${UNIVERAL_BUILD_PATH}/${FRAMEWORK_NAME}.framework/Modules/${FRAMEWORK_NAME}.swiftmodule\"\n\n# 8\n# Replace the framework executable within the framework with\n# a new version created by merging the device and simulator frameworks executables with lipo.\nlipo -create -output \"${UNIVERAL_BUILD_PATH}/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}\" \"${BUILD_PATH}/${CONFIGURATION}-iphoneos/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}\" \"${BUILD_PATH}/${CONFIGURATION}-iphonesimulator/${FRAMEWORK_NAME}.framework/${FRAMEWORK_NAME}\"\n\n# 9\n# Open the build directory in finder\nopen \"${BUILD_PATH}\"\n";
+		};
 		CB25B8F81EBCF0CE00FEB0A2 /* SwiftLint */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
@@ -453,6 +490,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = marker;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -480,6 +518,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				BITCODE_GENERATION_MODE = bitcode;
+				BUILD_LIBRARY_FOR_DISTRIBUTION = YES;
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_IDENTITY = "Apple Development";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "";
@@ -530,6 +569,22 @@
 			};
 			name = Release;
 		};
+		BA91C145266F0D6B00E6486F /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BA91C146266F0D6B00E6486F /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -556,6 +611,15 @@
 			buildConfigurations = (
 				28F828951C494B2C00330CF4 /* Debug */,
 				28F828961C494B2C00330CF4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BA91C147266F0D6B00E6486F /* Build configuration list for PBXAggregateTarget "XLPagerTabStrip-Universal" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BA91C145266F0D6B00E6486F /* Debug */,
+				BA91C146266F0D6B00E6486F /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
