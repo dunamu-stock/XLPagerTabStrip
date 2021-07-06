@@ -376,7 +376,35 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     }
 
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard indexPath.item != currentIndex else { return }
+        guard indexPath.item != currentIndex else {
+            if enableDuplicateTapScrollToTop,
+               let currentViewController = viewControllers[safe: indexPath.item] {
+                
+                let scrollView: UIScrollView
+                
+                if let contentViewController = currentViewController as? PagerTabStripContentViewControllerable {
+                    if let contentScrollView = contentViewController.contentScrollView {
+                        scrollView = contentScrollView
+                    } else {
+                        contentViewController.didDuplicateTap()
+                        return
+                    }
+                } else if let contentScrollView = currentViewController.view.subviews.first(where: { $0 is UIScrollView }) as? UIScrollView {
+                    scrollView = contentScrollView
+                } else {
+                    return
+                }
+                
+                guard scrollView.contentOffset != .zero else { return }
+                
+                if let tableView = scrollView as? UITableView {
+                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+                } else {
+                    scrollView.setContentOffset(.zero, animated: true)
+                }
+            }
+            return
+        }
 
         buttonBarView.moveTo(index: indexPath.item, animated: true, swipeDirection: .none, pagerScroll: .yes)
         shouldUpdateButtonBarView = false
@@ -529,4 +557,17 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     private var shouldUpdateButtonBarView = true
     private var collectionViewDidLoad = false
 
+}
+
+private extension Array {
+//    subscript (safe index: UInt) -> Element? {
+//        return index < count ? self[Int(index)] : nil
+//    }
+//
+    subscript (safe index: Int) -> Element? {
+        guard index > -1 else {
+            return nil
+        }
+        return index < count ? self[index] : nil
+    }
 }
