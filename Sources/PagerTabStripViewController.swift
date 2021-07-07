@@ -32,7 +32,7 @@ public protocol IndicatorInfoProvider {
 
 }
 
-public protocol PagerTabStripDelegate: class {
+public protocol PagerTabStripDelegate: AnyObject {
 
     func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int)
 }
@@ -42,9 +42,14 @@ public protocol PagerTabStripIsProgressiveDelegate: PagerTabStripDelegate {
     func updateIndicator(for viewController: PagerTabStripViewController, fromIndex: Int, toIndex: Int, withProgressPercentage progressPercentage: CGFloat, indexWasChanged: Bool)
 }
 
-public protocol PagerTabStripDataSource: class {
+public protocol PagerTabStripDataSource: AnyObject {
 
     func viewControllers(for pagerTabStripController: PagerTabStripViewController) -> [UIViewController]
+}
+
+public protocol PagerTabStripContentViewControllerable: AnyObject {
+    var contentScrollView: UIScrollView? { get }
+    func didDuplicateTap()
 }
 
 // MARK: PagerTabStripViewController
@@ -61,6 +66,7 @@ open class PagerTabStripViewController: UIViewController, UIScrollViewDelegate {
     open private(set) var viewControllers = [UIViewController]()
     open private(set) var currentIndex = 0
     open private(set) var preCurrentIndex = 0 // used *only* to store the index to which move when the pager becomes visible
+    open var enableDuplicateTapScrollToTop = true
 
     open var pageWidth: CGFloat {
         return containerView.bounds.width
