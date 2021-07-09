@@ -192,6 +192,10 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     open override func shouldMoveToViewController(at index: Int) -> Bool {
         return true
     }
+    
+    open override func canMoveToViewController(at index: Int) -> Bool {
+        return true
+    }
 
     open override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -372,7 +376,38 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     }
 
     open func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        guard indexPath.item != currentIndex else { return }
+        guard indexPath.item != currentIndex else {
+            if enableDuplicateTapScrollToTop,
+               let currentViewController = viewControllers[safe: indexPath.item] {
+                
+                let scrollView: UIScrollView
+                
+                if let contentViewController = currentViewController as? PagerTabStripContentViewControllerable {
+                    if let contentScrollView = contentViewController.contentScrollView {
+                        scrollView = contentScrollView
+                    } else {
+                        contentViewController.didDuplicateTap()
+                        return
+                    }
+                } else if let contentScrollView = currentViewController.view as? UIScrollView {
+                    scrollView = contentScrollView
+                } else if let contentScrollView = currentViewController.view.subviews.first(where: { $0 is UIScrollView }) as? UIScrollView{
+                    scrollView = contentScrollView
+                } else {
+                    return
+                }
+                
+                guard scrollView.contentOffset != .zero else { return }
+                
+                if let tableView = scrollView as? UITableView {
+                    tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+                    tableView.setContentOffset(CGPoint(x: 0, y: -tableView.contentInset.top), animated: true)
+                } else {
+                    scrollView.setContentOffset(CGPoint(x: 0, y: -scrollView.contentInset.top), animated: true)
+                }
+            }
+            return
+        }
 
         buttonBarView.moveTo(index: indexPath.item, animated: true, swipeDirection: .none, pagerScroll: .yes)
         shouldUpdateButtonBarView = false
@@ -436,8 +471,8 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
         }
         
         cell.imageView.contentMode = .center
-        cell.imageView.image = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
-        cell.imageView.highlightedImage = indicatorInfo.image?.withRenderingMode(.alwaysTemplate)
+        cell.imageView.image = indicatorInfo.image//?.withRenderingMode(.alwaysOriginal)
+        cell.imageView.highlightedImage = indicatorInfo.image//?.withRenderingMode(.alwaysOriginal)
         
         if let image = indicatorInfo.image {
             cell.imageViewWidthConstraint.constant = image.size.width
@@ -525,4 +560,17 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
     private var shouldUpdateButtonBarView = true
     private var collectionViewDidLoad = false
 
+}
+
+private extension Array {
+//    subscript (safe index: UInt) -> Element? {
+//        return index < count ? self[Int(index)] : nil
+//    }
+//
+    subscript (safe index: Int) -> Element? {
+        guard index > -1 else {
+            return nil
+        }
+        return index < count ? self[index] : nil
+    }
 }
