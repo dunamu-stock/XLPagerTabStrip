@@ -389,7 +389,9 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
                         contentViewController.didDuplicateTap()
                         return
                     }
-                } else if let contentScrollView = currentViewController.view.subviews.first(where: { $0 is UIScrollView }) as? UIScrollView {
+                } else if let contentScrollView = currentViewController.view as? UIScrollView {
+                    scrollView = contentScrollView
+                } else if let contentScrollView = currentViewController.view.subviews.first(where: { $0 is UIScrollView }) as? UIScrollView{
                     scrollView = contentScrollView
                 } else {
                     return
@@ -399,8 +401,9 @@ open class ButtonBarPagerTabStripViewController: PagerTabStripViewController, Pa
                 
                 if let tableView = scrollView as? UITableView {
                     tableView.scrollToRow(at: IndexPath(row: 0, section: 0), at: .top, animated: true)
+                    tableView.setContentOffset(CGPoint(x: 0, y: -tableView.contentInset.top), animated: true)
                 } else {
-                    scrollView.setContentOffset(.zero, animated: true)
+                    scrollView.setContentOffset(CGPoint(x: 0, y: -scrollView.contentInset.top), animated: true)
                 }
             }
             return
